@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Odisha Mining Expo//OMIIE 2027//EN
+BEGIN:VEVENT
+UID:omiie2027@odishaminingexpo.com
+DTSTAMP:20260712T000000Z
+DTSTART;TZID=Asia/Kolkata:20270107T100000
+DTEND;TZID=Asia/Kolkata:20270110T180000
+SUMMARY:5th Odisha Mining & Infrastructure International Expo 2027
+DESCRIPTION:India's premier platform for mining\, infrastructure\, heavy equipment & industrial innovation. Free entry for trade visitors — register at https://odishaminingexpo.com/visitor-registration/
+LOCATION:Baramunda Exhibition Ground\, Bhubaneswar\, Odisha\, India
+URL:https://odishaminingexpo.com/
+END:VEVENT
+END:VCALENDAR
