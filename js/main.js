@@ -365,3 +365,24 @@
     {name:'interest',label:'Areas of Interest',type:'checkbox-group'}
   ]);
 })();
+
+document.querySelectorAll(".nav-toggle").forEach(btn=>{
+
+    btn.addEventListener("click",function(e){
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const parent=this.parentElement;
+
+        document.querySelectorAll(".nav-drop").forEach(item=>{
+            if(item!==parent){
+                item.classList.remove("active");
+            }
+        });
+
+        parent.classList.toggle("active");
+
+    });
+
+});
