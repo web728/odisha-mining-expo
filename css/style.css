@@ -37,22 +37,76 @@ h1,h2,h3,h4,.disp{font-family:var(--disp);font-weight:800;line-height:1.08;lette
 .hl{color:var(--yellow)}
 .rule{width:64px;height:5px;background:var(--yellow);margin:18px 0 0;transform:skewX(-20deg)}
 
-.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:.92rem;padding:15px 30px;transition:all .22s ease;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
-.btn.solid{background:var(--yellow);color:var(--black)}
-.btn.solid:hover{background:var(--white)}
-.btn.dark{background:var(--black);color:var(--white)}
-.btn.dark:hover{background:var(--black-3)}
-.btn.ghost{border:2px solid var(--yellow);color:var(--white);clip-path:none}
-.btn.ghost:hover{background:var(--yellow);color:var(--black)}
-.btn .arr{transition:transform .22s ease}
-.btn:hover .arr{transform:translateX(4px)}
+/* --- BUTTON CONTRAST HOVER FIX --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--disp);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .92rem;
+  padding: 15px 30px;
+  transition: all .22s ease;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.btn.solid {
+  background: var(--yellow);
+  color: var(--black) !important; /* Force black text color initially */
+}
+
+/* FIX: Hover par background white hoga toh text color ko dark rakhna zaroori hai */
+.btn.solid:hover {
+  background: var(--white) !important;
+  color: var(--black) !important; /* White background par text clear black dikhega */
+}
+
+/* Nav specific button safety wrapper */
+.nlinks .btn.solid,
+.nlinks .btn.solid:hover {
+  border-bottom: none !important; /* Nav links ka bottom border line clean karne ke liye */
+}
+
+.btn.dark {
+  background: var(--black);
+  color: var(--white);
+}
+.btn.dark:hover {
+  background: var(--black-3);
+}
+
+.btn.ghost {
+  border: 2px solid var(--yellow);
+  color: var(--white);
+  clip-path: none;
+}
+.btn.ghost:hover {
+  background: var(--yellow);
+  color: var(--black) !important;
+}
+
+.btn .arr {
+  transition: transform .22s ease;
+}
+.btn:hover .arr {
+  transform: translateX(4px);
+}
+
+.nlinks .btn {
+  padding: 10px 20px;
+  font-size: .8rem;
+}
 
 /* --- nav --- */
 nav.site{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(20,21,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:box-shadow .25s}
 nav.site.scrolled{box-shadow:0 6px 30px rgba(0,0,0,.45)}
 .navin{max-width:var(--max);margin:0 auto;padding:0 24px;height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand img{height:46px;width:auto}
+.brand img{height:80px;width:auto}
 .nlinks{display:flex;gap:26px;align-items:center;font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
 .nlinks a{color:var(--grey);padding:6px 0;border-bottom:3px solid transparent;transition:color .2s,border-color .2s}
 .nlinks a:hover{color:var(--white)}
@@ -61,15 +115,155 @@ nav.site.scrolled{box-shadow:0 6px 30px rgba(0,0,0,.45)}
 .burger{display:none;background:none;border:none;color:var(--white);font-size:1.7rem;cursor:pointer;line-height:1}
 
 /* nav dropdown (Exhibit / Visit) */
-.nav-drop{position:relative;display:flex;align-items:center}
-.nav-drop-menu{position:absolute;top:100%;left:50%;margin-top:14px;min-width:210px;padding:8px;background:var(--black-2);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.4);opacity:0;pointer-events:none;transform:translateX(-50%) translateY(-6px) scale(.96);transform-origin:top center;transition:opacity 160ms ease-out,transform 160ms ease-out}
-.nav-drop:hover .nav-drop-menu,.nav-drop:focus-within .nav-drop-menu{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0) scale(1)}
-.nav-drop-menu a{display:block;padding:10px 14px;font-size:.78rem;font-weight:700;white-space:nowrap;color:var(--grey);border-bottom:none}
-.nav-drop-menu a:hover{color:var(--white);background:rgba(255,255,255,.06)}
+/* nav dropdown (Exhibit / Visit) */
+.nav-drop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%; /* Ensure hover stays alive across the header height */
+}
+
+.nav-drop-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  
+  /* FIX: Margin ko hata kar padding lagayi taaki dead-zone khatam ho jaye */
+  margin-top: 0; 
+  padding-top: 14px; /* Yeh invisible bridge ka kaam karega */
+  
+  min-width: 210px;
+  background: transparent; /* Main outer container transparent rahega */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-6px) scale(.96);
+  transform-origin: top center;
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
+}
+
+/* NEW SUB-CONTAINER: Background block ko wrap karne ke liye */
+.nav-drop-menu::before {
+  content: '';
+  position: absolute;
+  top: 14px; /* Dropdown menu top padding ke baad shuru hoga */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--black-2);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(0,0,0,.4);
+  z-index: -1;
+  border-radius: 8px; /* Optional: adds a premium look */
+}
+
+/* Menu items adjustment */
+.nav-drop-menu a {
+  display: block;
+  position: relative;
+  margin-top: 2px; /* Smooth listing layout space */
+  padding: 10px 14px;
+  font-size: .78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--grey);
+  border-bottom: none;
+  z-index: 1;
+}
+
+/* Pehle link ke liye top spacing set karna jab box khule */
+.nav-drop-menu a:first-of-type {
+  margin-top: 16px; 
+}
+.nav-drop-menu a:last-of-type {
+  margin-bottom: 8px;
+}
+
+.nav-drop-menu a:hover {
+  color: var(--white);
+  background: rgba(255,255,255,.06);
+  border-radius: 4px;
+}
+
+.nav-drop:hover .nav-drop-menu,
+.nav-drop:focus-within .nav-drop-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
 
 @media(max-width:1020px){
-  .nlinks{position:fixed;inset:78px 0 auto 0;background:var(--black-2);flex-direction:column;padding:28px 24px;gap:20px;display:none;border-bottom:4px solid var(--yellow);overflow-y:auto}
-  .nlinks.open{display:flex}
+@media(max-width:1020px) {
+  .nlinks {
+    position: fixed;
+    inset: 78px 0 auto 0;
+    background: var(--black-2);
+    flex-direction: column;
+    padding: 28px 24px;
+    gap: 20px;
+    display: none;
+    border-bottom: 4px solid var(--yellow);
+    overflow-y: auto;
+    max-height: calc(100vh - 78px); /* Full screen overflow safety */
+  }
+  
+  .nlinks.open {
+    display: flex;
+  }
+  
+  .burger {
+    display: block;
+  }
+  
+  /* --- MOBILE DROPDOWN ACCORDION RESET --- */
+  .nav-drop {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+
+  /* FOR MOBILE: Hover behavior ko cancel karna */
+  .nav-drop:hover .nav-drop-menu {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+
+  /* JavaScript is class (.active) ke throw control karega mobile menu */
+  .nav-drop.active .nav-drop-menu {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: static !important;
+    transform: none !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 0 0 16px !important;
+    margin-top: 6px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    transition: none !important;
+  }
+
+  .nav-drop-menu a {
+    padding: 8px 0 !important;
+    font-size: .74rem !important;
+    display: block !important;
+  }
+  
+  /* Custom Arrow indicator toggle look on mobile */
+  .nav-drop > a::after {
+    content: ' ▾';
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .nav-drop.active > a::after {
+    transform: rotate(180deg);
+  }
+}
+
+
   .burger{display:block}
   .nav-drop{flex-direction:column;align-items:flex-start;width:100%}
   .nav-drop-menu{position:static;opacity:1;pointer-events:auto;transform:none;background:none;border:none;box-shadow:none;padding:2px 0 0 16px;margin-top:6px;min-width:0}
@@ -96,7 +290,7 @@ nav.site.scrolled{box-shadow:0 6px 30px rgba(0,0,0,.45)}
 .hero-meta{display:flex;flex-wrap:wrap;gap:14px 34px;font-family:var(--disp);font-weight:700;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;margin:24px 0 30px}
 .hero-meta b{color:var(--yellow)}
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:56px}
-.count{display:inline-grid;grid-template-columns:repeat(4,minmax(56px,70px));border:1px solid var(--line);background:rgba(20,21,23,.66);backdrop-filter:blur(8px)}
+.count{display:inline-grid;grid-template-columns:repeat(4,minmax(100px, 120px));border:1px solid var(--line);background:rgba(20,21,23,.66);backdrop-filter:blur(8px)}
 .count>div{padding:9px 4px;text-align:center;border-right:1px solid var(--line)}
 .count>div:last-child{border-right:none}
 .count b{display:block;font-family:var(--disp);font-weight:800;font-size:1.35rem;color:var(--yellow);line-height:1;font-variant-numeric:tabular-nums}
@@ -134,15 +328,118 @@ section{padding:96px 0}
 .stat i{position:absolute;top:-2px;left:-2px;width:26px;height:26px;background:var(--yellow);clip-path:polygon(0 0,100% 0,0 100%)}
 
 /* icon cards */
-.icards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.icard{background:var(--black-2);border:1px solid var(--line);border-top:4px solid var(--yellow);padding:30px 26px;transition:transform .25s,border-color .25s}
-.icard:hover{transform:translateY(-6px)}
-.icard .ic{width:52px;height:52px;background:var(--yellow);color:var(--black);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-.icard h3{font-size:1.12rem;text-transform:uppercase;margin-bottom:8px}
-.icard p{color:var(--grey);font-size:.95rem}
-.light .icard{background:var(--white);border-color:var(--line-l)}
-.light .icard p{color:var(--grey-d)}
-.light .icard h3{color:var(--ink)}
+/* ----- MODERN RE-BALANCED GRID SYSTEM ----- */
+
+.feat-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+/* Intro Text - Split into 2 neat columns on wide screens */
+.feat-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 60px; /* Space between intro text and cards */
+}
+
+.feat-intro .lead-text {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--grey-d, #4A4A4A);
+  margin: 0;
+}
+
+/* 3-Column Grid Layout for Cards */
+.icards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 Equal columns */
+  gap: 32px;
+}
+
+/* Premium Card Design */
+.icard {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 4px solid var(--yellow, #F4C430); /* Top accent block instead of side border */
+  border-radius: 0 0 16px 16px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column; /* Stack contents vertically */
+  gap: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+/* Card Hover Mechanics */
+.icard:hover {
+  transform: translateY(-8px); /* Elevates upwards smoothly */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+/* Badge Styling */
+.icard .ic {
+  width: 44px;
+  height: 44px;
+  background: var(--yellow, #F4C430);
+  color: #000;
+  font-family: var(--disp, sans-serif);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+
+.icard-content h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  color: var(--ink, #111111);
+}
+
+.icard-content p {
+  color: var(--grey-d, #666666);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Dark Theme Compatibility */
+.dark .feat-intro .lead-text { color: #A0A0A0; }
+.dark .icard {
+  background: var(--black-2, #161719);
+  border-color: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.dark .icard h3 { color: #FFFFFF; }
+.dark .icard p { color: #A0A0A0; }
+
+
+/* ----- RESPONSIVE ADAPTATIONS ----- */
+
+@media (max-width: 992px) {
+  /* Break to 2 columns on tablets */
+  .icards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .feat-intro {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Stack everything into a single column on mobile */
+  .icards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
 /* mineral bars */
 .mineral{display:grid;gap:14px;max-width:840px}
@@ -180,17 +477,153 @@ section{padding:96px 0}
 .light .feat p{color:var(--grey-d)}
 
 /* marquee */
-.logo-marq{overflow:hidden;position:relative;padding:12px 0;border-top:1px solid var(--line-l);border-bottom:1px solid var(--line-l)}
-.logo-track{display:flex;gap:18px;width:max-content;animation:marq 60s linear infinite}
-.logo-track:hover{animation-play-state:paused}
-.logo-track img{height:76px;width:auto;border:1px solid var(--line-l);background:#fff}
-@keyframes marq{to{transform:translateX(-50%)}}
+/* marquee */
+.logo-marq {
+  overflow: hidden;
+  position: relative;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-l);
+  border-bottom: 1px solid var(--line-l);
+  
+  /* Page ke 80% ke andar scroll rakhne ke liye */
+  width: 80%;
+  margin: 0 auto; 
+}
+
+/* Dono corners par dark fading effect */
+.logo-marq::before,
+.logo-marq::after {
+  content: "";
+  height: 100%;
+  position: absolute;
+  width: 80px; /* Isko thoda badha diya hai taaki aur smooth fade ho */
+  z-index: 2;
+  top: 0;
+  pointer-events: none; /* Taaki shadow ke upar bhi hover kaam kare */
+}
+
+.logo-marq::before {
+  left: 0;
+  /* Left side ko dark se transparent banayega */
+  background: linear-gradient(to right, rgba(20, 21, 23, 1) 0%, rgba(20, 21, 23, 0) 100%); 
+}
+
+.logo-marq::after {
+  right: 0;
+  /* Right side ko dark se transparent banayega */
+  background: linear-gradient(to left, rgba(20, 21, 23, 1) 0%, rgba(20, 21, 23, 0) 100%);
+}
+
+.logo-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  /* Speed ko 60s se thoda tej kiya hai kyunki images badh gayi hain */
+  animation: marq 30s linear infinite; 
+}
+
+.logo-track:hover {
+  animation-play-state: paused;
+}
+
+.logo-track img {
+  height: 76px;
+  width: auto;
+  border: 1px solid var(--line-l);
+  background: #fff;
+}
+
+/* Infinite loop animation ka sahi tarika */
+@keyframes marq {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Kyunki humne items exact double kiye hain, isliye -50% par smoothly infinite loop banega */
+    transform: translateX(-50%); 
+  }
+}
 
 /* partners */
-.partners{display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start}
-.pgroup small{font-family:var(--disp);font-weight:700;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--grey-d);display:block;margin-bottom:12px}
-.pgroup .prow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.pgroup img{height:56px;width:auto;background:#fff;padding:8px;border:1px solid var(--line-l)}
+/* ----- PREMIUM PARTNERS SECTION ----- */
+
+/* ----- ULTRA-MINIMAL PREMIUM PARTNERS ----- */
+
+.partners {
+  display: flex;
+  flex-direction: column; /* Sabhi groups ko ek ke niche ek horizontal line mein laya */
+  gap: 48px; /* Har group ke beech achha space */
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Har ek horizontal row */
+.pgroup {
+  display: flex;
+  align-items: center; /* Label aur logos ek line mein */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle dividing line */
+  padding-bottom: 28px;
+}
+
+.pgroup:last-child {
+  border-bottom: none; /* Aakhri row ke niche line nahi chahiye */
+}
+
+/* Left side ka text label (Organiser, Partner etc.) */
+.pgroup small {
+  font-family: var(--disp);
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--grey-d);
+  width: 220px; /* Label ko fix space di taaki saare logos ek hi line se shuru hon */
+  flex-shrink: 0;
+}
+
+/* Logos ka container */
+.pgroup .prow {
+  display: flex;
+  gap: 24px; /* Logos ke beech ka gap badhaya */
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Logos ki styling - Ekdam Saaf aur Bada dikhne ke liye */
+.pgroup img {
+  height: 68px; /* Size 52px se badha kar 68px kiya taaki text saaf padha jaye */
+  width: auto;
+  object-fit: contain; /* Image stretch ya distort nahi hogi */
+  background: #ffffff; 
+  padding: 12px 18px; /* Andar ki padding badhai taaki logos ko breathing space mile */
+  border-radius: 8px;
+  filter: grayscale(20%) opacity(0.9); /* Halka sa blend kiya screen ke sath */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Elegant Hover Animation */
+.pgroup img:hover {
+  filter: grayscale(0%) opacity(1); /* Hover par poora original color */
+  transform: scale(1.04) translateY(-2px); /* Halka sa upar uthega smoothly */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); /* Premium soft shadow */
+}
+
+/* Mobile responsive karne ke liye chhoti screen par layouts adjust ho jayenge */
+@media (max-width: 768px) {
+  .pgroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .pgroup small {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+
+
+
 
 /* gallery */
 .ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -352,6 +785,150 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
   .count{grid-template-columns:repeat(4,minmax(48px,60px))}
   .count b{font-size:1.1rem}
   .hero-facet{width:78%}
+}
+
+/* ----- MAIN CONTAINER & TOP COLUMN REFINEMENTS ----- */
+.mining-heart-section {
+  padding: 80px 0;
+  background-color: #F9FAFB; /* Off-white surface background makes white cards pop */
+}
+
+.feat {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.feat .txt .eyebrow {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--yellow, #F4C430);
+  font-weight: 700;
+}
+
+.feat .txt h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  text-transform: uppercase;
+  margin: 14px 0 20px 0;
+  color: #111111;
+  line-height: 1.2;
+}
+
+.feat .txt .rule {
+  width: 60px;
+  height: 4px;
+  background: var(--yellow, #F4C430);
+  margin-bottom: 24px;
+}
+
+.feat .txt .lead-desc {
+  color: #555555; /* Solid visible text color */
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.feat .img-frame img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+}
+
+/* ----- BENTO GRID SYSTEM FOR CARDS ----- */
+.icards-bento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Clean 3-column structural balance */
+  gap: 24px;
+}
+
+/* Premium Card Refactor */
+.icards-bento .icard {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.4s ease;
+}
+
+/* Elevating Hover Motion */
+.icards-bento .icard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.05);
+}
+
+/* Modern Minimalist Icon Accent */
+.icards-bento .ic-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(244, 196, 48, 0.12); /* Subtle yellow tint wrapper */
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border-radius: 10px;
+}
+
+/* Card Content Contrast Fixes */
+.icard-body h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111111; /* Deep high-contrast ink color */
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.icard-body p {
+  font-size: 0.95rem;
+  color: #555555; /* Visible descriptive text color */
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Dark Mode Safety Net override */
+.dark .mining-heart-section { background-color: #0F1011; }
+.dark .feat .txt h2 { color: #FFFFFF; }
+.dark .feat .txt .lead-desc { color: #B0B0B0; }
+.dark .icards-bento .icard {
+  background: #161719;
+  border-color: rgba(255, 255, 255, 0.04);
+}
+.dark .icards-bento .ic-icon { background: rgba(244, 196, 48, 0.15); color: #FFF; }
+.dark .icard-body h3 { color: #FFFFFF; }
+.dark .icard-body p { color: #A0A0A0; }
+
+
+/* ----- RESPONSIVE ADAPTATIONS ----- */
+
+@media (max-width: 1024px) {
+  .feat {
+    grid-template-columns: 1fr; /* Stack top image and text on tablets */
+    gap: 40px;
+  }
+  .icards-bento {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+  }
+}
+
+@media (max-width: 640px) {
+  .icards-bento {
+    grid-template-columns: 1fr; /* Clean single column stack on mobile devices */
+    gap: 16px;
+  }
+  .icards-bento .icard {
+    padding: 24px;
+  }
 }
 
 /* ===== v2 additions ===== */
