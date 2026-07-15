@@ -1,5 +1,6 @@
 import clientPromise from "../lib/mongodb.js";
 import { transporter } from "../lib/mailer.js";
+import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 
 export default async function handler(req, res) {
 
@@ -51,75 +52,35 @@ export default async function handler(req, res) {
 
         });
 
+        const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
+
         await transporter.sendMail({
 
-            from: `"Futurex Website" <${process.env.EMAIL_USER}>`,
+            from: `"Odisha Mining Expo" <${process.env.EMAIL_USER}>`,
+            replyTo: email,
 
             to: [
                 "info@futurextrade.com",
                 "admin@futurextrade.com"
             ],
 
-            subject: "New Exhibitor Registration",
+            subject: `Exhibitor Registration — ${company} | Odisha Mining Expo 2027`,
 
-            html: `
-
-            <h2>New Exhibitor Registration</h2>
-
-            <table border="1" cellpadding="10" cellspacing="0">
-
-                <tr>
-                    <td><b>Company</b></td>
-                    <td>${company}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Contact Person</b></td>
-                    <td>${name}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Designation</b></td>
-                    <td>${designation || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Email</b></td>
-                    <td>${email}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Phone</b></td>
-                    <td>${phone}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Country</b></td>
-                    <td>${country || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Primary Category</b></td>
-                    <td>${category || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Stand Preference</b></td>
-                    <td>${standSize || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Requirements</b></td>
-                    <td>${message || "-"}</td>
-                </tr>
-
-            </table>
-
-            <br>
-
-            <b>Submitted At:</b> ${new Date().toLocaleString("en-IN")}
-
-            `
+            html: buildAdminEmailHtml({
+                badge: "Exhibitor Registration",
+                submittedAt,
+                rows: [
+                    { label: "Company", value: company },
+                    { label: "Contact Person", value: name },
+                    { label: "Designation", value: designation },
+                    { label: "Email", value: email },
+                    { label: "Phone", value: phone },
+                    { label: "Country", value: country },
+                    { label: "Primary Category", value: category },
+                    { label: "Stand Preference", value: standSize },
+                    { label: "Requirements", value: message }
+                ]
+            })
 
         });
 

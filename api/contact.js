@@ -1,5 +1,6 @@
 import clientPromise from "../lib/mongodb.js";
 import { transporter } from "../lib/mailer.js";
+import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 
 export default async function handler(req, res) {
 
@@ -49,70 +50,34 @@ export default async function handler(req, res) {
 
         });
 
+        const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
+
         await transporter.sendMail({
 
-            from: `"Futurex Website" <${process.env.EMAIL_USER}>`,
+            from: `"Odisha Mining Expo" <${process.env.EMAIL_USER}>`,
+            replyTo: email,
 
             to: [
                 "info@futurextrade.com",
                 "admin@futurextrade.com"
             ],
 
-            subject: "New Contact Form Submission",
+            subject: `Contact Enquiry — ${fullName} | Odisha Mining Expo 2027`,
 
-            html: `
-
-            <h2>New Contact Enquiry</h2>
-
-            <table border="1" cellpadding="10" cellspacing="0">
-
-            <tr>
-                <td><b>Full Name</b></td>
-                <td>${fullName}</td>
-            </tr>
-
-            <tr>
-                <td><b>Company</b></td>
-                <td>${company || "-"}</td>
-            </tr>
-
-            <tr>
-                <td><b>Email</b></td>
-                <td>${email}</td>
-            </tr>
-
-            <tr>
-                <td><b>Phone</b></td>
-                <td>${phone}</td>
-            </tr>
-
-            <tr>
-                <td><b>Designation</b></td>
-                <td>${designation || "-"}</td>
-            </tr>
-
-            <tr>
-                <td><b>Country</b></td>
-                <td>${country || "-"}</td>
-            </tr>
-
-            <tr>
-                <td><b>Interest</b></td>
-                <td>${interestType || "-"}</td>
-            </tr>
-
-            <tr>
-                <td><b>Message</b></td>
-                <td>${message || "-"}</td>
-            </tr>
-
-            </table>
-
-            <br>
-
-            <b>Submitted At:</b> ${new Date().toLocaleString("en-IN")}
-
-            `
+            html: buildAdminEmailHtml({
+                badge: "Contact Enquiry",
+                submittedAt,
+                rows: [
+                    { label: "Full Name", value: fullName },
+                    { label: "Company", value: company },
+                    { label: "Email", value: email },
+                    { label: "Phone", value: phone },
+                    { label: "Designation", value: designation },
+                    { label: "Country", value: country },
+                    { label: "Interest", value: interestType },
+                    { label: "Message", value: message }
+                ]
+            })
 
         });
 

@@ -1,5 +1,6 @@
 import clientPromise from "../lib/mongodb.js";
 import { transporter } from "../lib/mailer.js";
+import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 
 export default async function handler(req, res) {
 
@@ -51,70 +52,34 @@ export default async function handler(req, res) {
 
         });
 
+        const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
+
         await transporter.sendMail({
 
-            from: `"Futurex Website" <${process.env.EMAIL_USER}>`,
+            from: `"Odisha Mining Expo" <${process.env.EMAIL_USER}>`,
+            replyTo: email,
 
             to: [
                 "info@futurextrade.com",
                 "admin@futurextrade.com"
             ],
 
-            subject: "New Visitor Registration",
+            subject: `Visitor Registration — ${name} | Odisha Mining Expo 2027`,
 
-            html: `
-
-            <h2>New Visitor Registration</h2>
-
-            <table border="1" cellpadding="10" cellspacing="0">
-
-                <tr>
-                    <td><b>Full Name</b></td>
-                    <td>${name}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Designation</b></td>
-                    <td>${designation || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Company / Organisation</b></td>
-                    <td>${company}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Email</b></td>
-                    <td>${email}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Phone</b></td>
-                    <td>${phone}</td>
-                </tr>
-
-                <tr>
-                    <td><b>City / Country</b></td>
-                    <td>${city || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Visitor Profile</b></td>
-                    <td>${profile || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td><b>Areas of Interest</b></td>
-                    <td>${interestList.length ? interestList.join(", ") : "-"}</td>
-                </tr>
-
-            </table>
-
-            <br>
-
-            <b>Submitted At:</b> ${new Date().toLocaleString("en-IN")}
-
-            `
+            html: buildAdminEmailHtml({
+                badge: "Visitor Registration",
+                submittedAt,
+                rows: [
+                    { label: "Full Name", value: name },
+                    { label: "Designation", value: designation },
+                    { label: "Company / Organisation", value: company },
+                    { label: "Email", value: email },
+                    { label: "Phone", value: phone },
+                    { label: "City / Country", value: city },
+                    { label: "Visitor Profile", value: profile },
+                    { label: "Areas of Interest", value: interestList.join(", ") }
+                ]
+            })
 
         });
 
