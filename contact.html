@@ -98,7 +98,22 @@
              To capture leads server-side instead, wire this form to Formspree/WPForms/a CRM endpoint. -->
         <form class="form" id="contactForm" style="margin-top:18px" novalidate>
           <div class="field"><label for="cf-n">Name</label><input id="cf-n" name="name" type="text" required autocomplete="name"><span class="err">Please enter your name.</span></div>
-          <div class="field"><label for="cf-e">Email</label><input id="cf-e" name="email" type="email" required autocomplete="email"><span class="err">Please enter a valid email address.</span></div>
+          <div class="form-row">
+            <div class="field"><label for="cf-e">Email</label><input id="cf-e" name="email" type="email" required autocomplete="email"><span class="err">Please enter a valid email address.</span></div>
+            <div class="field"><label for="cf-p">Phone</label><input id="cf-p" name="phone" type="tel" required autocomplete="tel" placeholder="+91 XXXXX XXXXX"><span class="err">Please enter a phone number.</span></div>
+          </div>
+          <div class="field">
+            <label for="cf-i">I'm enquiring about</label>
+            <select id="cf-i" name="interest" required>
+              <option value="">Select one&hellip;</option>
+              <option>Exhibitor / Stand Booking</option>
+              <option>Visitor Registration</option>
+              <option>Sponsorship / Partnership</option>
+              <option>Media / Press</option>
+              <option>General Enquiry</option>
+            </select>
+            <span class="err">Please select an option.</span>
+          </div>
           <div class="field"><label for="cf-m">Message</label><textarea id="cf-m" name="message" rows="5" required></textarea><span class="err">Please enter a message.</span></div>
           <!-- Honeypot: hidden from sighted/keyboard users via CSS + tabindex, bots that auto-fill every field will trip it -->
           <div class="hp-field" aria-hidden="true"><label for="cf-hp">Leave this field empty</label><input id="cf-hp" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>

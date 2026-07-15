@@ -76,7 +76,7 @@
   /* contact form -> inline validation + mailto fallback (no backend required) */
   var f=document.getElementById('contactForm');
   if(f){
-    var fields=[f.name,f.email,f.message];
+    var fields=[f.name,f.email,f.phone,f.interest,f.message];
     fields.forEach(function(el){
       el.addEventListener('blur',function(){validateField(el);});
     });
@@ -105,10 +105,10 @@
         fullName: f.name.value,
         company: f.company ? f.company.value : "",
         email: f.email.value,
-        phone: f.phone ? f.phone.value : "",
+        phone: f.phone.value,
         designation: f.designation ? f.designation.value : "",
         country: f.country ? f.country.value : "",
-        interestType: "Contact Enquiry",
+        interestType: f.interest.value,
         message: f.message.value
     };
 

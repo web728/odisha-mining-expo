@@ -24,7 +24,7 @@ export default async function handler(req, res) {
             message
         } = req.body;
 
-        if (!fullName || !email || !message) {
+        if (!fullName || !email || !phone || !interestType || !message) {
             return res.status(400).json({
                 success: false,
                 message: "Required fields missing."
@@ -62,10 +62,10 @@ export default async function handler(req, res) {
                 "admin@futurextrade.com"
             ],
 
-            subject: `Contact Enquiry — ${fullName} | Odisha Mining Expo 2027`,
+            subject: `New Contact Enquiry — ${fullName} | Odisha Mining Expo 2027`,
 
             html: buildAdminEmailHtml({
-                badge: "Contact Enquiry",
+                badge: "New Contact Enquiry",
                 submittedAt,
                 rows: [
                     { label: "Full Name", value: fullName },
