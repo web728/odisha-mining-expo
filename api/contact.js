@@ -1,6 +1,11 @@
 import clientPromise from "../lib/mongodb.js";
 import { transporter } from "../lib/mailer.js";
 import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
+import { appendToExcel } from "../lib/excelSheet.js";
+
+// Google Sheet ID (browser URL me sheet kholne pe /d/ aur /edit ke beech wala part)
+// .env me GOOGLE_SHEET_ID set karna — code me hardcode mat karo
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 export default async function handler(req, res) {
 
@@ -15,11 +20,8 @@ export default async function handler(req, res) {
 
         const {
             fullName,
-            company,
             email,
             phone,
-            designation,
-            country,
             interestType,
             message
         } = req.body;
@@ -38,11 +40,8 @@ export default async function handler(req, res) {
         await db.collection("contacts").insertOne({
 
             fullName,
-            // company,
             email,
             phone,
-            // designation,
-            // country,
             interestType,
             message,
 
@@ -51,6 +50,20 @@ export default async function handler(req, res) {
         });
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
+
+        // --- Google Sheet me row add karo ---
+        // Sheet tab "Contact Forms" me header row is order me honi chahiye:
+        // Full Name | Email | Phone | Interest | Message | Submitted At
+        if (SPREADSHEET_ID) {
+            await appendToExcel(SPREADSHEET_ID, "Contact Forms", [
+                fullName,
+                email,
+                phone,
+                interestType,
+                message,
+                submittedAt
+            ]);
+        }
 
         await transporter.sendMail({
 
@@ -69,11 +82,8 @@ export default async function handler(req, res) {
                 submittedAt,
                 rows: [
                     { label: "Full Name", value: fullName },
-                    // { label: "Company", value: company },
                     { label: "Email", value: email },
                     { label: "Phone", value: phone },
-                    // { label: "Designation", value: designation },
-                    // { label: "Country", value: country },
                     { label: "Interest", value: interestType },
                     { label: "Message", value: message }
                 ]

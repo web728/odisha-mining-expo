@@ -27,3 +27,6 @@ Thumbs.db
 # Temporary Files
 *.tmp
 *.temp
+
+api/google-credentials.json
+*api/google-credentials.json

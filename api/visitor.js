@@ -1,6 +1,9 @@
 import clientPromise from "../lib/mongodb.js";
 import { transporter } from "../lib/mailer.js";
 import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
+import { appendToExcel } from "../lib/excelSheet.js";
+
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 export default async function handler(req, res) {
 
@@ -53,6 +56,23 @@ export default async function handler(req, res) {
         });
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
+
+        // --- Google Sheet me row add karo ---
+        // Sheet tab "Visitor Forms" me header row is order me honi chahiye:
+        // Full Name | Designation | Company | Email | Phone | City/Country | Visitor Profile | Areas of Interest | Submitted At
+        if (SPREADSHEET_ID) {
+            await appendToExcel(SPREADSHEET_ID, "Visitor Forms", [
+                name,
+                designation || "-",
+                company,
+                email,
+                phone,
+                city || "-",
+                profile || "-",
+                interestList.length ? interestList.join(", ") : "-",
+                submittedAt
+            ]);
+        }
 
         await transporter.sendMail({
 
