@@ -61,18 +61,12 @@ export default async function handler(req, res) {
         // Sheet tab "Exhibitor Forms" me header row is order me honi chahiye:
         // Company | Contact Person | Designation | Email | Phone | Country | Category | Stand Preference | Requirements | Submitted At
         if (SPREADSHEET_ID) {
-            await appendToExcel(SPREADSHEET_ID, "Exhibitor Forms", [
-                company,
-                name,
-                designation || "-",
-                email,
-                phone,
-                country || "-",
-                category || "-",
-                standSize || "-",
-                message || "-",
-                submittedAt
-            ]);
+            await appendToExcel(
+                SPREADSHEET_ID,
+                "Exhibitor Forms",
+                ["Company", "Contact Person", "Designation", "Email", "Phone", "Country", "Category", "Stand Preference", "Requirements", "Submitted At"],
+                [company, name, designation || "-", email, phone, country || "-", category || "-", standSize || "-", message || "-", submittedAt]
+            );
         }
 
         await transporter.sendMail({
