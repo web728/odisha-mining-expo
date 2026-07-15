@@ -1,0 +1,28 @@
+{
+  "name": "odisha-mining-expo-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/web728/odisha-mining-expo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/web728/odisha-mining-expo/issues"
+  },
+  "homepage": "https://github.com/web728/odisha-mining-expo#readme",
+  "dependencies": {
+    "mongodb": "^7.5.0",
+    "nodemailer": "^9.0.3"
+  }
+}

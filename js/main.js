@@ -87,22 +87,57 @@
       field.classList.toggle('invalid',!valid);
       return valid;
     }
-    f.addEventListener('submit',function(ev){
-      ev.preventDefault();
-      if(f.company_website&&f.company_website.value){
-        return; /* honeypot tripped — silently drop, likely a bot */
-      }
-      var allValid=fields.map(validateField).every(Boolean);
-      if(!allValid){
-        showToast('Please fill in all fields correctly.');
+  f.addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+
+    if (f.company_website && f.company_website.value) {
         return;
-      }
-      var n=encodeURIComponent(f.name.value),e=encodeURIComponent(f.email.value),m=encodeURIComponent(f.message.value);
-      showToast('Opening your email app to send the message…');
-      setTimeout(function(){
-        location.href='mailto:info@futurextrade.com?subject=Enquiry%20from%20'+n+'&body='+m+'%0A%0AFrom:%20'+n+'%20('+e+')';
-      },700);
-    });
+    }
+
+    var allValid = fields.map(validateField).every(Boolean);
+
+    if (!allValid) {
+        showToast("Please fill in all fields correctly.");
+        return;
+    }
+
+    const data = {
+        fullName: f.name.value,
+        company: f.company ? f.company.value : "",
+        email: f.email.value,
+        phone: f.phone ? f.phone.value : "",
+        designation: f.designation ? f.designation.value : "",
+        country: f.country ? f.country.value : "",
+        interestType: "Contact Enquiry",
+        message: f.message.value
+    };
+
+    try {
+
+        showToast("Submitting...");
+
+        const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast("Thank you! Your enquiry has been submitted.");
+            f.reset();
+        } else {
+            showToast(result.message || "Submission failed.");
+        }
+
+    } catch (err) {
+        console.error(err);
+        showToast("Server Error.");
+    }
+});
   }
 })();
 
@@ -284,65 +319,153 @@
 (function(){
   'use strict';
 
-  function setupRegForm(formId, mailtoAddr, subjectPrefix, fieldDefs){
-    var f=document.getElementById(formId);
-    if(!f)return;
+ function setupRegForm(formId, apiUrl, subjectPrefix, fieldDefs) {
 
-    function fieldWrap(el){
-      return el.closest('.field') || el.closest('fieldset') || el.closest('.consent');
-    }
-    function validateField(el){
-      var wrap=fieldWrap(el);
-      var valid=el.checkValidity();
-      if(wrap)wrap.classList.toggle('invalid',!valid);
-      return valid;
+    var f = document.getElementById(formId);
+
+    if (!f) return;
+
+    function fieldWrap(el) {
+        return el.closest('.field') || el.closest('fieldset') || el.closest('.consent');
     }
 
-    var requiredEls=Array.prototype.slice.call(f.querySelectorAll('[required]'));
-    requiredEls.forEach(function(el){
-      el.addEventListener('blur',function(){validateField(el);});
-      el.addEventListener('change',function(){validateField(el);});
+    function validateField(el) {
+
+        var wrap = fieldWrap(el);
+
+        var valid = el.checkValidity();
+
+        if (wrap) wrap.classList.toggle('invalid', !valid);
+
+        return valid;
+
+    }
+
+    var requiredEls = Array.prototype.slice.call(
+        f.querySelectorAll("[required]")
+    );
+
+    requiredEls.forEach(function (el) {
+
+        el.addEventListener("blur", function () {
+            validateField(el);
+        });
+
+        el.addEventListener("change", function () {
+            validateField(el);
+        });
+
     });
 
-    f.addEventListener('submit',function(ev){
-      ev.preventDefault();
-      if(f.company_website&&f.company_website.value){
-        return; /* honeypot tripped */
-      }
-      var allValid=requiredEls.map(validateField).every(Boolean);
-      if(!allValid){
-        showToast('Please fill in all required fields.');
-        var firstInvalid=requiredEls.find(function(el){return !el.checkValidity();});
-        if(firstInvalid)firstInvalid.focus();
-        return;
-      }
+    f.addEventListener("submit", async function (ev) {
 
-      var lines=[];
-      fieldDefs.forEach(function(def){
-        if(def.type==='checkbox-group'){
-          var checked=Array.prototype.slice.call(f.querySelectorAll('input[name="'+def.name+'"]:checked')).map(function(c){return c.value;});
-          if(checked.length)lines.push(def.label+': '+checked.join(', '));
-        } else if(def.type==='radio-group'){
-          var sel=f.querySelector('input[name="'+def.name+'"]:checked');
-          if(sel)lines.push(def.label+': '+sel.value);
-        } else {
-          var el=f.elements[def.name];
-          if(el&&el.value)lines.push(def.label+': '+el.value);
+        ev.preventDefault();
+
+        if (f.company_website && f.company_website.value) {
+            return;
         }
-      });
 
-      var nameField=f.elements['name']||f.elements['company'];
-      var subjectName=nameField?nameField.value:'';
-      var subject=encodeURIComponent(subjectPrefix+(subjectName?' from '+subjectName:''));
-      var body=encodeURIComponent(lines.join('\n'));
-      showToast('Opening your email app to send your details…');
-      setTimeout(function(){
-        location.href='mailto:'+mailtoAddr+'?subject='+subject+'&body='+body;
-      },700);
+        var allValid = requiredEls.map(validateField).every(Boolean);
+
+        if (!allValid) {
+
+            showToast("Please fill in all required fields.");
+
+            var firstInvalid = requiredEls.find(function (el) {
+                return !el.checkValidity();
+            });
+
+            if (firstInvalid) firstInvalid.focus();
+
+            return;
+
+        }
+
+        var data = {};
+
+        fieldDefs.forEach(function (def) {
+
+            if (def.type === "checkbox-group") {
+
+                data[def.name] = Array.from(
+                    f.querySelectorAll(
+                        'input[name="' + def.name + '"]:checked'
+                    )
+                ).map(function (x) {
+                    return x.value;
+                });
+
+            }
+
+            else if (def.type === "radio-group") {
+
+                var sel = f.querySelector(
+                    'input[name="' + def.name + '"]:checked'
+                );
+
+                data[def.name] = sel ? sel.value : "";
+
+            }
+
+            else {
+
+                var el = f.elements[def.name];
+
+                data[def.name] = el ? el.value : "";
+
+            }
+
+        });
+
+        try {
+
+            showToast("Submitting...");
+
+            const response = await fetch(apiUrl, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(data)
+
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+
+                showToast("Submitted Successfully.");
+
+                f.reset();
+
+            } else {
+
+                showToast(result.message || "Submission failed.");
+
+            }
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            showToast("Server Error.");
+
+        }
+
     });
-  }
 
-  setupRegForm('exhibitorForm','info@futurextrade.com','Stand Booking Enquiry - OMIIE 2027',[
+}
+
+ setupRegForm(
+  'exhibitorForm',
+  '/api/exhibitor',
+  'Stand Booking Enquiry - OMIIE 2027',
+  [
     {name:'company',label:'Company'},
     {name:'name',label:'Contact Person'},
     {name:'designation',label:'Designation'},
@@ -352,9 +475,14 @@
     {name:'category',label:'Primary Category'},
     {name:'standSize',label:'Stand Preference',type:'radio-group'},
     {name:'message',label:'Requirements'}
-  ]);
+  ]
+);
 
-  setupRegForm('visitorForm','info@futurextrade.com','Visitor Registration - OMIIE 2027',[
+setupRegForm(
+  'visitorForm',
+  '/api/visitor',
+  'Visitor Registration - OMIIE 2027',
+  [
     {name:'name',label:'Full Name'},
     {name:'designation',label:'Designation'},
     {name:'company',label:'Company / Organisation'},
@@ -363,7 +491,8 @@
     {name:'city',label:'City / Country'},
     {name:'profile',label:'Visitor Profile'},
     {name:'interest',label:'Areas of Interest',type:'checkbox-group'}
-  ]);
+  ]
+);
 })();
 
 document.querySelectorAll(".nav-toggle").forEach(btn=>{
