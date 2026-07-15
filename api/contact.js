@@ -38,11 +38,11 @@ export default async function handler(req, res) {
         await db.collection("contacts").insertOne({
 
             fullName,
-            company,
+            // company,
             email,
             phone,
-            designation,
-            country,
+            // designation,
+            // country,
             interestType,
             message,
 
@@ -69,11 +69,11 @@ export default async function handler(req, res) {
                 submittedAt,
                 rows: [
                     { label: "Full Name", value: fullName },
-                    { label: "Company", value: company },
+                    // { label: "Company", value: company },
                     { label: "Email", value: email },
                     { label: "Phone", value: phone },
-                    { label: "Designation", value: designation },
-                    { label: "Country", value: country },
+                    // { label: "Designation", value: designation },
+                    // { label: "Country", value: country },
                     { label: "Interest", value: interestType },
                     { label: "Message", value: message }
                 ]
