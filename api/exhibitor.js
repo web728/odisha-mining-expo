@@ -5,6 +5,9 @@ import { appendToExcel } from "../lib/excelSheet.js";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 
+// Teeno forms (Contact / Exhibitor / Visitor) ab isi ek tab me jaate hain.
+const SHEET_NAME = "Submissions";
+
 export default async function handler(req, res) {
 
     if (req.method !== "POST") {
@@ -57,16 +60,18 @@ export default async function handler(req, res) {
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
 
-        // --- Google Sheet me row add karo ---
-        // Sheet tab "Exhibitor Forms" me header row is order me honi chahiye:
-        // Company | Contact Person | Designation | Email | Phone | Country | Category | Stand Preference | Requirements | Submitted At
+        // --- Google Sheet me row add karo (shared "Submissions" tab) ---
         if (SPREADSHEET_ID) {
-            await appendToExcel(
-                SPREADSHEET_ID,
-                "Exhibitor Forms",
-                ["Company", "Contact Person", "Designation", "Email", "Phone", "Country", "Category", "Stand Preference", "Requirements", "Submitted At"],
-                [company, name, designation || "-", email, phone, country || "-", category || "-", standSize || "-", message || "-", submittedAt]
-            );
+            await appendToExcel(SPREADSHEET_ID, SHEET_NAME, {
+                "Date & Time": submittedAt,
+                "Platform": "Exhibitor Form",
+                "Register As": "Exhibitor",
+                "Company Name": company,
+                "Contact Person": name,
+                "Designation": designation || "-",
+                "Email Id": email,
+                "Mobile No.": phone
+            });
         }
 
         await transporter.sendMail({

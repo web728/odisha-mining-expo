@@ -28,5 +28,6 @@ Thumbs.db
 *.tmp
 *.temp
 
-api/google-credentials.json
-*api/google-credentials.json
+# Google service account credentials (kahi bhi folder me ho, ignore ho jaye)
+google-credentials.json
+**/google-credentials.json
