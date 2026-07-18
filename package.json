@@ -2,13 +2,14 @@
   "name": "odisha-mining-expo-website",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   },
   "homepage": "https://github.com/web728/odisha-mining-expo#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "googleapis": "^173.0.0",
     "mongodb": "^7.5.0",
     "nodemailer": "^9.0.3"
