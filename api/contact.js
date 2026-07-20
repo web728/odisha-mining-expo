@@ -8,7 +8,7 @@ import { appendToExcel } from "../lib/excelSheet.js";
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 // Teeno forms (Contact / Exhibitor / Visitor) ab isi ek tab me jaate hain.
-const SHEET_NAME = "Submissions";
+const SHEET_NAME = "Website Enquries";
 
 export default async function handler(req, res) {
 
