@@ -4,8 +4,6 @@ import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 import { appendToExcel } from "../lib/excelSheet.js";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-
-// Teeno forms (Contact / Exhibitor / Visitor) ab isi ek tab me jaate hain.
 const SHEET_NAME = "Website Enquries";
 
 export default async function handler(req, res) {
@@ -40,11 +38,9 @@ export default async function handler(req, res) {
         const interestList = Array.isArray(interest) ? interest : [];
 
         const client = await clientPromise;
-
         const db = client.db("futurex");
 
         await db.collection("visitors").insertOne({
-
             fullName: name,
             designation,
             company,
@@ -53,24 +49,25 @@ export default async function handler(req, res) {
             city,
             profile,
             interest: interestList,
-
             submittedAt: new Date()
-
         });
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
 
-        // --- Google Sheet me row add karo (shared "Submissions" tab) ---
+        // --- Google Sheet me row add karo (shared "Website Enquries" tab) ---
         if (SPREADSHEET_ID) {
             await appendToExcel(SPREADSHEET_ID, SHEET_NAME, {
-                "Date & Time": submittedAt,
+                "Date": submittedAt,                              // FIX: "Date & Time" -> "Date"
                 "Platform": "Visitor Form",
                 "Register As": "Visitor",
                 "Company Name": company,
                 "Contact Person": name,
                 "Designation": designation || "-",
                 "Email Id": email,
-                "Mobile No.": phone
+                "Mobile No.": phone,
+                "Country": city || "-",                           // FIX: form ka "city" field yaha Country me jayega
+                "Area of Interest": interestList.join(", ") || "-", // FIX: interest checkboxes comma se join hoke aayenge
+                "Product Profile": profile || "-"                 // FIX: visitor profile yaha jayega
             });
         }
 
@@ -104,11 +101,8 @@ export default async function handler(req, res) {
         });
 
         return res.status(200).json({
-
             success: true,
-
             message: "Visitor registration submitted successfully."
-
         });
 
     }
@@ -118,11 +112,8 @@ export default async function handler(req, res) {
         console.error(error);
 
         return res.status(500).json({
-
             success: false,
-
             message: "Internal Server Error"
-
         });
 
     }

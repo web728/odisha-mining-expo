@@ -3,11 +3,7 @@ import { transporter } from "../lib/mailer.js";
 import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 import { appendToExcel } from "../lib/excelSheet.js";
 
-// Google Sheet ID (browser URL me sheet kholne pe /d/ aur /edit ke beech wala part)
-// .env me GOOGLE_SHEET_ID set karna — code me hardcode mat karo
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-
-// Teeno forms (Contact / Exhibitor / Visitor) ab isi ek tab me jaate hain.
 const SHEET_NAME = "Website Enquries";
 
 export default async function handler(req, res) {
@@ -37,34 +33,31 @@ export default async function handler(req, res) {
         }
 
         const client = await clientPromise;
-
         const db = client.db("futurex");
 
         await db.collection("contacts").insertOne({
-
             fullName,
             email,
             phone,
             interestType,
             message,
-
             submittedAt: new Date()
-
         });
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
 
-        // --- Google Sheet me row add karo (shared "Submissions" tab) ---
+        // --- Google Sheet me row add karo (shared "Website Enquries" tab) ---
         if (SPREADSHEET_ID) {
             await appendToExcel(SPREADSHEET_ID, SHEET_NAME, {
-                "Date & Time": submittedAt,
+                "Date": submittedAt,               // FIX: pehle "Date & Time" bhej rahe the, sheet ka header "Date" hai
                 "Platform": "Contact Form",
                 "Register As": interestType,
                 "Company Name": "-",
                 "Contact Person": fullName,
                 "Designation": "-",
                 "Email Id": email,
-                "Mobile No.": phone
+                "Mobile No.": phone,
+                "Message": message                 // FIX: contact ka message ab Excel me bhi jayega
             });
         }
 
@@ -95,11 +88,8 @@ export default async function handler(req, res) {
         });
 
         return res.status(200).json({
-
             success: true,
-
             message: "Form submitted successfully."
-
         });
 
     }
@@ -109,11 +99,8 @@ export default async function handler(req, res) {
         console.error(error);
 
         return res.status(500).json({
-
             success: false,
-
             message: "Internal Server Error"
-
         });
 
     }

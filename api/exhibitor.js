@@ -4,8 +4,6 @@ import { buildAdminEmailHtml } from "../lib/emailTemplate.js";
 import { appendToExcel } from "../lib/excelSheet.js";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-
-// Teeno forms (Contact / Exhibitor / Visitor) ab isi ek tab me jaate hain.
 const SHEET_NAME = "Website Enquries";
 
 export default async function handler(req, res) {
@@ -39,11 +37,9 @@ export default async function handler(req, res) {
         }
 
         const client = await clientPromise;
-
         const db = client.db("futurex");
 
         await db.collection("exhibitors").insertOne({
-
             company,
             fullName: name,
             designation,
@@ -53,24 +49,25 @@ export default async function handler(req, res) {
             category,
             standSize,
             message,
-
             submittedAt: new Date()
-
         });
 
         const submittedAt = new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" });
 
-        // --- Google Sheet me row add karo (shared "Submissions" tab) ---
+        // --- Google Sheet me row add karo (shared "Website Enquries" tab) ---
         if (SPREADSHEET_ID) {
             await appendToExcel(SPREADSHEET_ID, SHEET_NAME, {
-                "Date & Time": submittedAt,
+                "Date": submittedAt,                         // FIX: "Date & Time" -> "Date"
                 "Platform": "Exhibitor Form",
                 "Register As": "Exhibitor",
                 "Company Name": company,
                 "Contact Person": name,
                 "Designation": designation || "-",
                 "Email Id": email,
-                "Mobile No.": phone
+                "Mobile No.": phone,
+                "Country": country || "-",                   // FIX: ab Country column bhi fill hoga
+                "Area of Interest": category || "-",         // FIX: exhibitor ki category yaha jayegi
+                "Message": `Stand: ${standSize || "-"} | ${message || "-"}`  // FIX: stand size + message combine
             });
         }
 
@@ -105,11 +102,8 @@ export default async function handler(req, res) {
         });
 
         return res.status(200).json({
-
             success: true,
-
             message: "Exhibitor registration submitted successfully."
-
         });
 
     }
@@ -119,11 +113,8 @@ export default async function handler(req, res) {
         console.error(error);
 
         return res.status(500).json({
-
             success: false,
-
             message: "Internal Server Error"
-
         });
 
     }
